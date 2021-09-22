@@ -27,15 +27,15 @@ public class SC_Slots : MonoBehaviour
                 case SC_EnumGlobal.SlotState.Empty: slotImage.enabled = false; break;
                 case SC_EnumGlobal.SlotState.Black:
                     slotImage.enabled = true;
-                    slotImage.sprite = SC_GlobalVariables.Instance.GetSprite("Black");// SC_GameData.Instance.GetSprite("Black");
+                    slotImage.sprite = SC_GlobalVariables.Instance.GetSprite("Black");
                     break;
                 case SC_EnumGlobal.SlotState.White:
                     slotImage.enabled = true;
-                    slotImage.sprite = SC_GlobalVariables.Instance.GetSprite("White") ; // SC_GameData.Instance.GetSprite("White");
+                    slotImage.sprite = SC_GlobalVariables.Instance.GetSprite("White") ; 
                     break;
                 case SC_EnumGlobal.SlotState.Optional:
                     slotImage.enabled = true;
-                    slotImage.sprite = SC_GlobalVariables.Instance.GetSprite("Green"); // SC_GameData.Instance.GetSprite("White");
+                    slotImage.sprite = SC_GlobalVariables.Instance.GetSprite("Green"); 
                     break;
             }
         }

@@ -11,6 +11,7 @@ public class SC_MenuController : MonoBehaviour
     public void Btn_MultyPlayer() { SC_MenuLogic.Instance.Btn_MultyPlayerLogic();}
     public void Btn_StudentInfo() { SC_MenuLogic.Instance.Btn_StudentInfoLogic(); }
     public void Btn_Options() { SC_MenuLogic.Instance.Btn_OptionsLogic(); }
+    public void Btn_Sound() { SC_MenuLogic.Instance.Btn_SoundLogic(); }
     public void Btn_back() { SC_MenuLogic.Instance.Btn_backLogic();}
     public void Btn_LeaveRoom() { SC_MenuLogic.Instance.Btn_LeaveRoomLogic(); }
 

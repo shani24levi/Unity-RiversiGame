@@ -154,13 +154,15 @@ public class SC_Board
 
     public void SetClicedSlots(List<int> items ,SC_EnumGlobal.SlotState slotState)
     {
+        // A function handles the current list of black and white and arranges the arrays by a click selected in the queue.
+        // Gets an array of the route chosen for color change, and gets the color.
         if (slotState == SC_EnumGlobal.SlotState.White)
         {
             for (int i = 0; i < items.Count; i++)
             {
                 if (curBoard[items[i]] == SC_EnumGlobal.SlotState.Black)
                 {
-                    clickedBlack.Remove(items[i]); 
+                    clickedBlack.Remove(items[i]);
                     clickedWhite.Add(items[i]);
                 }
                 else if (curBoard[items[i]] == SC_EnumGlobal.SlotState.Optional)

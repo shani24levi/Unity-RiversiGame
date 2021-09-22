@@ -11,5 +11,5 @@ public class SC_EnumGlobal
     public enum Boundary { Top=0, Bottom=35, Left=6, Right=5 }; //if Top<0 , Bottom>35(Size of matrix), Left%6 ,Right+1%6  // OUT OF MATRIX
     public enum MatchState { NoWinner, Winner, Tie, WinnerBlack, WinnerWhite };
     public enum TurnState { Opponent, Player };
-    public enum GameType { SinglePlayer, Multiplayer };
+    public enum GameType { SinglePlayer, Multiplayer, None };
 }
