@@ -52,7 +52,6 @@ public class SC_Board
             return true;
         return false;
     }
-
     public List<int> GetAmountSlots_BW()
     {
         List<int> _list = new List<int>();
@@ -71,8 +70,6 @@ public class SC_Board
             tempArr = clickedWhite;
         else if(slotState == SC_EnumGlobal.SlotState.Black)
             tempArr = clickedBlack;
-
-       // Debug.Log("FOR - " + slotState);
 
         for (int i = 0; i < tempArr.Count; i++)
             {
@@ -95,7 +92,6 @@ public class SC_Board
         }
         return _listOptions;
     }
-
     public bool is_in_Boundaries(int cuurDirection, int prevDirection, int direction, SC_EnumGlobal.Boundary boundary)
     {
         //Checking the cases of the matrix boundaries
@@ -206,7 +202,7 @@ public class SC_Board
     {
         List<int> _list = new List<int>();
 
-        if (_listOptions.Count == 0) return -1;
+        if (_listOptions.Count == 0) return -1;  //-1 meens no moves for Ai
 
         foreach (List<int> arr in _listOptions)
             foreach (int i in arr)
@@ -218,7 +214,6 @@ public class SC_Board
     }
     public SC_EnumGlobal.SlotState GetSlotValue(int _Index) { return curBoard[_Index];}
     public void SetSlotValue(int _Index, SC_EnumGlobal.SlotState _NewState) {curBoard[_Index] = _NewState; }
-
     public void SetAiColor(SC_EnumGlobal.SlotState slot) { aiStart = slot;}
     public SC_EnumGlobal.SlotState GetAiColor() { return aiStart; }
 }

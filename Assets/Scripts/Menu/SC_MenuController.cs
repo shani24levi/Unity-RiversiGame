@@ -17,11 +17,8 @@ public class SC_MenuController : MonoBehaviour
 
     public void Btn_MultyPlayerStart() { SC_MenuLogic.Instance.Btn_MultyPlayerStartLogic(); }
     public void Btn_Link() { SC_MenuLogic.Instance.Btn_LinkLogic(); }
-
     public void Btn_Play() {SC_MenuLogic.Instance.Btn_Play();}
-
     public void Slider_MultyPlayer() { SC_MenuLogic.Instance.Slider_MultyPlayerLogic(); }
     public void Slider_Music() { SC_MenuLogic.Instance.Slider_MusicLogic(); }
     public void Slider_Sfx() { SC_MenuLogic.Instance.Slider_SfxLogic(); }
-    public void Btn_Back_MainMenu() { SC_MenuLogic.Instance.Btn_Back_MainMenuLogic(); }
 }

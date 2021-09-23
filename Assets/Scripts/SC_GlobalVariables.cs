@@ -9,14 +9,10 @@ public class SC_GlobalVariables : MonoBehaviour
     public static int matrixLength = 6; //matrix is n*n
     public static int slotAmount = matrixLength * matrixLength; //6*6=36
 
-    public static string _inRoomId;
     public static string userId;
     public static SC_EnumGlobal.GameType curType = SC_EnumGlobal.GameType.None;
     public static int maxTurnTime = 15;
-    public static string userLeftId;
-    public static bool endRoom = false;
-
-
+    public static string userLeftId = "";
     #endregion
 
     private Dictionary<string, Sprite> unitySprites;

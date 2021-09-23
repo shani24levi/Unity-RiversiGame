@@ -20,7 +20,6 @@ public class SC_MenuLogic : MonoBehaviour
     private Dictionary<string, object> passedParms;
     private List<string> roomIds;
     private string roomId;
-    private string thisUserId;
     private int roomIndex = 0;
 
     #region Singleton
@@ -49,7 +48,6 @@ public class SC_MenuLogic : MonoBehaviour
         Listener.OnUserLeftRoom += OnUserLeftRoom;
         Listener.OnRoomDestroyed += OnRoomDestroyed;
     }
-
     private void OnDisable()
     {
         Listener.OnConnect -= OnConnect;
@@ -62,7 +60,6 @@ public class SC_MenuLogic : MonoBehaviour
         Listener.OnUserLeftRoom += OnUserLeftRoom;
         Listener.OnRoomDestroyed -= OnRoomDestroyed;
     }
-
 
     private void Awake() { Init(); }
     private void Start()
@@ -113,7 +110,7 @@ public class SC_MenuLogic : MonoBehaviour
         else if (SC_GlobalVariables.curType == SC_EnumGlobal.GameType.SinglePlayer && SC_GlobalVariables.userLeftId != null)
         {
             //close the room
-            Debug.Log("bey bey all usrs and room");
+            //Debug.Log("bey bey all usrs and room");
             Btn_backLogic();
             unityObjects["Btn_Play"].GetComponent<Button>().interactable = true;
             WarpClient.GetInstance().LeaveRoom(roomId);         //user leave room
@@ -123,9 +120,9 @@ public class SC_MenuLogic : MonoBehaviour
         }
         else if (SC_GlobalVariables.curType == SC_EnumGlobal.GameType.Multiplayer)
         {
-            Debug.Log("bey bey one user");
+            //Debug.Log("bey bey one user");
             Btn_backLogic();
-            SC_GlobalVariables.userLeftId = thisUserId;
+            //SC_GlobalVariables.userLeftId = thisUserId;
             unityObjects["Btn_Play"].GetComponent<Button>().interactable = true;
             WarpClient.GetInstance().LeaveRoom(roomId);         //user leave room
             WarpClient.GetInstance().UnsubscribeRoom(roomId);  //Unsubscribe user from room
@@ -140,7 +137,6 @@ public class SC_MenuLogic : MonoBehaviour
         WarpClient.GetInstance().GetRoomsInRange(1, 2);
         UpdateStatus("Searching..");
     }
-    public void Btn_Back_MainMenuLogic() {ChangeScreen(SC_EnumGlobal.Screens.MainMenu);}
     public void Slider_MultyPlayerLogic()
     {unityObjects["Txt_value"].GetComponent<Text>().text = unityObjects["Slider_MultyPlayer"].GetComponent<Slider>().value.ToString() + "$";}
     public void Slider_MusicLogic()
@@ -156,8 +152,6 @@ public class SC_MenuLogic : MonoBehaviour
         GameObject[] _objs = GameObject.FindGameObjectsWithTag("unityObjects");
         foreach (GameObject g in _objs)
             unityObjects.Add(g.name, g);
-           //Debug.Log(g.name);
-
 
         passedParms = new Dictionary<string, object>();
         passedParms.Add("Password", unityObjects["Txt_value"].GetComponent<Text>().text);
@@ -181,8 +175,6 @@ public class SC_MenuLogic : MonoBehaviour
 
         SC_GlobalVariables.userId = System.DateTime.Now.Ticks.ToString();
         WarpClient.GetInstance().Connect(SC_GlobalVariables.userId);
-
-        unityObjects["Txt_UserId"].GetComponent<Text>().text = SC_GlobalVariables.userId;
         UpdateStatus("Connecting...");
         //end conect to api
 
@@ -196,7 +188,6 @@ public class SC_MenuLogic : MonoBehaviour
         unityObjects["Screen_MultyPlayer"].SetActive(false);
         unityObjects["Screen_StudentInfo"].SetActive(false);
         unityObjects["Screen_Options"].SetActive(false);
-        //unityObjects["Screen_SinglePlsyer"].SetActive(false);
     }
     private void ChangeScreen(SC_EnumGlobal.Screens _NewScreen)
     {
@@ -216,7 +207,7 @@ public class SC_MenuLogic : MonoBehaviour
     {
         if (roomIndex < roomIds.Count)
         {
-            UpdateStatus("Getting room Details of room: " + roomIds[roomIndex]);
+            UpdateStatus("Getting room: " + roomIds[roomIndex]);
             WarpClient.GetInstance().GetLiveRoomInfo(roomIds[roomIndex]);
         }
         else
@@ -230,7 +221,6 @@ public class SC_MenuLogic : MonoBehaviour
     #region CallBack
     private void OnConnect(bool _IsSuccess)
     {
-        Debug.Log("OnConnect: " + _IsSuccess);
         if (_IsSuccess)
         {
             unityObjects["Btn_Play"].GetComponent<Button>().interactable = true;
@@ -247,8 +237,8 @@ public class SC_MenuLogic : MonoBehaviour
             roomIds = new List<string>();
             foreach (var RoomData in eventObj.getRoomsData())
             {
-                Debug.Log("RoomId " + RoomData.getId());
-                Debug.Log("RoomOwner " + RoomData.getRoomOwner());
+                //Debug.Log("RoomId " + RoomData.getId());
+                //Debug.Log("RoomOwner " + RoomData.getRoomOwner());
                 roomIds.Add(RoomData.getId());
             }
         }
@@ -257,11 +247,11 @@ public class SC_MenuLogic : MonoBehaviour
     }
     private void OnCreateRoom(bool _IsSuccess, string _RoomId)
     {
-        Debug.Log("OnCreateRoom " + _IsSuccess + ", RoomId: " + _RoomId);
+        //Debug.Log("OnCreateRoom " + _IsSuccess + ", RoomId: " + _RoomId);
         if (_IsSuccess)
         {
             roomId = _RoomId;
-            UpdateStatus("Room have been created, room Id: " + _RoomId);
+            UpdateStatus("Room created : " + _RoomId);
             WarpClient.GetInstance().JoinRoom(roomId);
             WarpClient.GetInstance().SubscribeRoom(roomId);
         }
@@ -269,11 +259,9 @@ public class SC_MenuLogic : MonoBehaviour
     }
     private void OnJoinRoom(bool _IsSuccess, string _RoomId)
     {
-        //Debug.Log("OnJoinRoom " + _IsSuccess + ", RoomId: " + _RoomId);
         if (_IsSuccess)
         {
-            SC_GlobalVariables._inRoomId = _RoomId;
-            UpdateStatus("Joined room: " + _RoomId + ", Waiting for an opponent");
+            UpdateStatus("Joined room: " + _RoomId + ", Waiting for an opponent...");
         }
         else
         {
@@ -285,7 +273,6 @@ public class SC_MenuLogic : MonoBehaviour
     }
     private void OnUserJoinRoom(RoomData eventObj, string _UserName)
     {
-        thisUserId = _UserName;
         UpdateStatus("User: " + _UserName + " has joined the room");
         if (eventObj.getRoomOwner() == SC_GlobalVariables.userId && SC_GlobalVariables.userId != _UserName)
         {
@@ -295,12 +282,12 @@ public class SC_MenuLogic : MonoBehaviour
     }
     private void OnGetLiveRoomInfo(LiveRoomInfoEvent eventObj)
     {
-        Debug.Log("OnGetLiveRoomInfo " + eventObj.getProperties());
+        //Debug.Log("OnGetLiveRoomInfo " + eventObj.getProperties());
         if (eventObj.getProperties() != null && eventObj.getProperties().ContainsKey("Password") &&
             eventObj.getProperties()["Password"].ToString() == passedParms["Password"].ToString())
         {
             roomId = eventObj.getData().getId();
-            UpdateStatus("Got room info, Matching, joining room... (" + roomId + ")");
+            UpdateStatus("Matching, joining room... (" + roomId + ")");
             WarpClient.GetInstance().JoinRoom(roomId);
             WarpClient.GetInstance().SubscribeRoom(roomId);
         }
@@ -314,18 +301,18 @@ public class SC_MenuLogic : MonoBehaviour
     private void OnGameStarted(string _Sender, string _RoomId, string _NextTurn)
     {
         ChangeScreen(SC_EnumGlobal.Screens.Game);
-        Debug.Log("_NextTurn" + _NextTurn);
         UpdateStatus("The game have started, Turn: " + _NextTurn);
     }
 
     private void OnUserLeftRoom(RoomData eventObj, string _UserName)
     {
-        Debug.Log("onclicked leave");
+        Debug.Log("onclicked leave " + _UserName);
     }
 
     private void OnRoomDestroyed(RoomData eventObj)
     {
         Debug.Log("room Destroyed");
+
     }
     #endregion
 

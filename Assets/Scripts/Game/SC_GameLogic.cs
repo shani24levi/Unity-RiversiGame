@@ -2,13 +2,13 @@
 using com.shephertz.app42.gaming.multiplayer.client;
 using com.shephertz.app42.gaming.multiplayer.client.events;
 using MiniJSON;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
+//Student: Shani levi 
+//Id: 302383619
 
 public class SC_GameLogic : MonoBehaviour
 {
@@ -67,35 +67,17 @@ public class SC_GameLogic : MonoBehaviour
             {
                 //when one user leave room then do playing faster
                 SC_GlobalVariables.curType = SC_EnumGlobal.GameType.SinglePlayer;
-                if (curTurn == SC_EnumGlobal.TurnState.Player)
+
+                unityObjects["Txt_Timer"].GetComponent<Text>().text = curDisplay.ToString();
+                if (_calcTime == 5 && flagOnce)
                 {
-                    unityObjects["Txt_Timer"].GetComponent<Text>().text = curDisplay.ToString();
-                    if (_calcTime == 5 && flagOnce)
-                    {
-                        Debug.Log("it not me how left and its my turn then wait for my move");
-                        flagOnce = false;  //makes sure it call one time 
-                        int _Index = curBoard.GetRandomSlot();  //get random index from the list of curr options
-                        //Placement(_Index);  //player move //ai move is called in placment()
-                        SetSlotDataMultyPlayer(_Index);
-                        gameStarted = false;
-                    }
-                    if (_calcTime == 4) gameStarted = false;
-                    if (_calcTime <= 10 && _calcTime >= 9) unityObjects["Txt_Timer"].GetComponent<Text>().text = "player left";
+                    flagOnce = false;  //makes sure it call one time 
+                    int _Index = curBoard.GetRandomSlot();  //get random index from the list of curr options
+                    SetSlotDataMultyPlayer(_Index);
+                    gameStarted = false;
                 }
-                else if (curTurn == SC_EnumGlobal.TurnState.Opponent)
-                {
-                    if (_calcTime <= 15 && _calcTime >= 10)
-                        unityObjects["Txt_Timer"].GetComponent<Text>().text = "player left";
-                    if (_calcTime <= 9 && _calcTime >= 4)
-                        unityObjects["Txt_Timer"].GetComponent<Text>().text = "Ai Playing..";
-                    if (_calcTime == 5 && flagOnce)
-                    {
-                        Debug.Log("clicked and then ai mov");
-                        flagOnce = false;
-                        StartCoroutine(AILogic());
-                        gameStarted = false;
-                    }
-                }
+                if (_calcTime == 4) gameStarted = false;
+                if (_calcTime <= 10 && _calcTime >= 9) unityObjects["Txt_Timer"].GetComponent<Text>().text = "player left";
             }
             else
             {
@@ -205,7 +187,7 @@ public class SC_GameLogic : MonoBehaviour
         else
         { //No Optins on the board for the palyer
             Debug.Log("game over no options ");
-            Placement(-2);
+            Placement(-2);  //-2 meens no moves for Player
         }
     }
     private IEnumerator AILogic()
@@ -344,8 +326,6 @@ public class SC_GameLogic : MonoBehaviour
                     curBoard.SetSlotValue(items[i], curState);
                     unityObjects["Slot" + items[i]].GetComponent<SC_Slots>().ChangeSlotState(curState);
                     unityObjects["Slot" + items[i]].GetComponent<Button>().interactable = false;
-                   // StartCoroutine(Wait());
-                    //yield return new WaitForSeconds(0.1f);
                 }
             }
         }      
@@ -414,14 +394,21 @@ public class SC_GameLogic : MonoBehaviour
             int _index = int.Parse(_data["Index"].ToString());
 
             SC_EnumGlobal.MatchState _curState = Placement(_index);
-
             if (_curState != SC_EnumGlobal.MatchState.NoWinner)
                 WarpClient.GetInstance().stopGame();
         }
         curTime = Time.time;
-        if (_Move.getNextTurn() == SC_GlobalVariables.userId)
+
+        Debug.Log("curTurncurTurncurTurn " + curTurn);
+
+        if (_Move.getNextTurn() == SC_GlobalVariables.userId )
             curTurn = SC_EnumGlobal.TurnState.Player;
         else curTurn = SC_EnumGlobal.TurnState.Opponent;
+
+        //if(SC_GlobalVariables.userLeftId != "")
+        //    curTurn = SC_EnumGlobal.TurnState.Opponent;
+
+        Debug.Log("curTurncurTurncurTurn22222 " + curTurn);
     }
     private void OnGameStopped(string _Sender, string _RoomId)
     {
@@ -430,12 +417,22 @@ public class SC_GameLogic : MonoBehaviour
     private void OnUserLeftRoom(RoomData eventObj, string _UserName)
     {
         Debug.Log("left the room : " + _UserName + "currturn of : " + SC_GlobalVariables.userId);
-        if (SC_GlobalVariables.endRoom) return;
-        if (_UserName != SC_GlobalVariables.userId)
+
+        SC_GlobalVariables.userLeftId = _UserName;
+        if (_UserName != SC_GlobalVariables.userId && curTurn == SC_EnumGlobal.TurnState.Player)
         {
+            Debug.Log("Wait for Player move and then do AI move");
             modeChange = true;
-            SC_GlobalVariables.userLeftId = _UserName;
             SC_GlobalVariables.curType = SC_EnumGlobal.GameType.SinglePlayer;
+        }
+        //TO DO : fix when opennent left when thets his turn
+        else if (curTurn == SC_EnumGlobal.TurnState.Opponent)
+        {
+            Debug.Log("Do Ai move only");
+            gameStarted = false;
+            SC_GlobalVariables.curType = SC_EnumGlobal.GameType.SinglePlayer;
+            unityObjects["Txt_AiPlaying"].GetComponent<Text>().text = "Ai Playing..";
+            StartCoroutine(AILogic());
         }
     }
     #endregion
