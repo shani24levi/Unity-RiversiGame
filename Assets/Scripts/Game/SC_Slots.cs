@@ -10,7 +10,6 @@ public class SC_Slots : MonoBehaviour
 
     public int index = 0;
     public Image slotImage;
-    //public Sprite White, Black;
 
     public void Click()
     {

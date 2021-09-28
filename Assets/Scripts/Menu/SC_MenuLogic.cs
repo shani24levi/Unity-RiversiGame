@@ -57,7 +57,7 @@ public class SC_MenuLogic : MonoBehaviour
         Listener.OnUserJoinRoom -= OnUserJoinRoom;
         Listener.OnGetLiveRoomInfo -= OnGetLiveRoomInfo;
         Listener.OnGameStarted -= OnGameStarted;
-        Listener.OnUserLeftRoom += OnUserLeftRoom;
+        Listener.OnUserLeftRoom -= OnUserLeftRoom;
         Listener.OnRoomDestroyed -= OnRoomDestroyed;
     }
 
@@ -113,17 +113,19 @@ public class SC_MenuLogic : MonoBehaviour
             //Debug.Log("bey bey all usrs and room");
             Btn_backLogic();
             unityObjects["Btn_Play"].GetComponent<Button>().interactable = true;
+            UpdateStatus("Conected..");
             WarpClient.GetInstance().LeaveRoom(roomId);         //user leave room
             WarpClient.GetInstance().UnsubscribeRoom(roomId);  //Unsubscribe user from room
             WarpClient.GetInstance().DeleteRoom(roomId);
-            SC_GlobalVariables.userLeftId = null;
+            SC_GlobalVariables.userLeftId = "";
         }
         else if (SC_GlobalVariables.curType == SC_EnumGlobal.GameType.Multiplayer)
         {
             //Debug.Log("bey bey one user");
             Btn_backLogic();
-            //SC_GlobalVariables.userLeftId = thisUserId;
             unityObjects["Btn_Play"].GetComponent<Button>().interactable = true;
+            //SC_GlobalVariables.curType = SC_EnumGlobal.GameType.SinglePlayer;
+            UpdateStatus("Conected..");
             WarpClient.GetInstance().LeaveRoom(roomId);         //user leave room
             WarpClient.GetInstance().UnsubscribeRoom(roomId);  //Unsubscribe user from room
         }
@@ -136,6 +138,7 @@ public class SC_MenuLogic : MonoBehaviour
         unityObjects["Btn_Play"].GetComponent<Button>().interactable = false;
         WarpClient.GetInstance().GetRoomsInRange(1, 2);
         UpdateStatus("Searching..");
+        //unityObjects["Btn_LeaveRoom"].GetComponent<Button>().interactable = false;
     }
     public void Slider_MultyPlayerLogic()
     {unityObjects["Txt_value"].GetComponent<Text>().text = unityObjects["Slider_MultyPlayer"].GetComponent<Slider>().value.ToString() + "$";}
@@ -306,13 +309,13 @@ public class SC_MenuLogic : MonoBehaviour
 
     private void OnUserLeftRoom(RoomData eventObj, string _UserName)
     {
-        Debug.Log("onclicked leave " + _UserName);
+        Debug.Log("1 onclicked leave " + _UserName);
+        SC_GlobalVariables.userLeftId = _UserName;
     }
 
     private void OnRoomDestroyed(RoomData eventObj)
     {
         Debug.Log("room Destroyed");
-
     }
     #endregion
 

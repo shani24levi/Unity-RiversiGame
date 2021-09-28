@@ -2,6 +2,7 @@
 using com.shephertz.app42.gaming.multiplayer.client;
 using com.shephertz.app42.gaming.multiplayer.client.events;
 using MiniJSON;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,7 +15,7 @@ public class SC_GameLogic : MonoBehaviour
 {
     private Dictionary<string, GameObject> unityObjects;
     private SC_EnumGlobal.SlotState curState;
-    private SC_EnumGlobal.TurnState curTurn;
+    private SC_EnumGlobal.TurnState curTurn, lefted;
     private SC_Board curBoard;
 
     private string nextTurn;
@@ -22,6 +23,7 @@ public class SC_GameLogic : MonoBehaviour
     private float curTime  = 0;
     private bool flagOnce = true;
     private bool modeChange, OneTime = false;
+
 
 
     #region Events
@@ -39,6 +41,8 @@ public class SC_GameLogic : MonoBehaviour
         Listener.OnGameStopped -= OnGameStopped;
         Listener.OnUserLeftRoom -= OnUserLeftRoom;
     }
+
+
     #endregion
 
     #region MonoBehaviour
@@ -122,11 +126,10 @@ public class SC_GameLogic : MonoBehaviour
         unityObjects["Txt_Amount_Player"].GetComponent<Text>().text = "2";
         unityObjects["Txt_Amount_Ai"].GetComponent<Text>().text = "2";
 
-        //Set initial Game moves
         curState = SC_EnumGlobal.SlotState.White;
         ChangeInteractableOptions(SC_EnumGlobal.SlotState.White); //The one who starts is white
         unityObjects["Img_CurrentState"].GetComponent<Image>().sprite = SC_GlobalVariables.Instance.GetSprite("White");
-        
+
         SinglePlayerStart();
     }
     private void SinglePlayerStart()
@@ -197,17 +200,17 @@ public class SC_GameLogic : MonoBehaviour
         int _rand = UnityEngine.Random.Range(2, 4);
         yield return new WaitForSeconds(_rand);
 
-        int _idx = curBoard.GetRandomSlot();
+        int _idx = curBoard.GetRandomSlot();  // _idx=-1 meens no move for ai -game is over
         Placement(_idx);
         curTurn = SC_EnumGlobal.TurnState.Player;
     }
     private SC_EnumGlobal.MatchState Placement(int _Index)
     {
         SC_EnumGlobal.MatchState _endState = SC_EnumGlobal.MatchState.NoWinner;
-        List<List<int>> _listOptions = curBoard.GetListOfOptions();
+        List<List<int>> _listOptions = curBoard.GetListOfOptions(); 
         List<int> backANDwhitAmount = curBoard.GetAmountSlots_BW();
 
-        if (_listOptions.Count == 0 || _Index < 0) //no options for the players -game over
+        if (_listOptions.Count == 0 || _Index < 0) //no options for the players or board is filled = Game over
         {
             Debug.Log("No moves for One Player, _listOptions= " + _listOptions.Count +" i= " + _Index);
 
@@ -257,7 +260,7 @@ public class SC_GameLogic : MonoBehaviour
                 }
             }
         }
-        else if (_Index != -1 || _Index != -2) //-1 meens no moves for AI //-2 meens no moves for Player
+        else if (_Index != -1 || _Index != -2) //Game continues // -1 meens no moves for AI //-2 meens no moves for Player
         { 
             if (curBoard.GetSlotValue(_Index) == SC_EnumGlobal.SlotState.Optional)
             {
@@ -268,29 +271,30 @@ public class SC_GameLogic : MonoBehaviour
                 List<int> amount = curBoard.GetAmountSlots_BW();
                 if (SC_EnumGlobal.SlotState.Black == curBoard.GetAiColor())
                 {
-                    if (SC_GlobalVariables.curType == SC_EnumGlobal.GameType.SinglePlayer)
-                    {
-                        unityObjects["Txt_Amount_Player"].GetComponent<Text>().text = amount[0].ToString();
-                        unityObjects["Txt_Amount_Ai"].GetComponent<Text>().text = amount[1].ToString();
-                    }
-                    else
+                    if (SC_GlobalVariables.curType == SC_EnumGlobal.GameType.Multiplayer )   
                     {
                         unityObjects["Txt_Amount_Player"].GetComponent<Text>().text = amount[1].ToString();
                         unityObjects["Txt_Amount_Ai"].GetComponent<Text>().text = amount[0].ToString();
+                    }
+                    else if (SC_GlobalVariables.curType == SC_EnumGlobal.GameType.SinglePlayer)
+                    {
+                        unityObjects["Txt_Amount_Player"].GetComponent<Text>().text = amount[0].ToString();
+                        unityObjects["Txt_Amount_Ai"].GetComponent<Text>().text = amount[1].ToString();
                     }
                 }
                 else if (SC_EnumGlobal.SlotState.White == curBoard.GetAiColor())
                 {
-                    if (SC_GlobalVariables.curType == SC_EnumGlobal.GameType.SinglePlayer)
-                    {
-                        unityObjects["Txt_Amount_Player"].GetComponent<Text>().text = amount[1].ToString();
-                        unityObjects["Txt_Amount_Ai"].GetComponent<Text>().text = amount[0].ToString();
-                    }
-                    else
+                    if (SC_GlobalVariables.curType == SC_EnumGlobal.GameType.Multiplayer ) 
                     {
                         unityObjects["Txt_Amount_Player"].GetComponent<Text>().text = amount[0].ToString();
                         unityObjects["Txt_Amount_Ai"].GetComponent<Text>().text = amount[1].ToString();
                     }
+                    else if (SC_GlobalVariables.curType == SC_EnumGlobal.GameType.SinglePlayer)
+                    {
+                        unityObjects["Txt_Amount_Player"].GetComponent<Text>().text = amount[1].ToString();
+                        unityObjects["Txt_Amount_Ai"].GetComponent<Text>().text = amount[0].ToString();
+                    }
+               
                 }
                 PassTurn();
             }
@@ -315,6 +319,7 @@ public class SC_GameLogic : MonoBehaviour
     }
     public void ChangeInterfaceSlots(int _index, SC_EnumGlobal.SlotState curState)
     {
+        //Handles the display of the color change after clicking Index
         List<List<int>> _listOptions = curBoard.GetListOfOptions();
         foreach (List<int> items in _listOptions)
         {
@@ -339,9 +344,8 @@ public class SC_GameLogic : MonoBehaviour
                 //send move
                 Dictionary<string, object> _toSer = new Dictionary<string, object>();
                 _toSer.Add("Index", _Index);
-                Debug.Log("_Index " + _Index);
                 string _toSend = Json.Serialize(_toSer);
-                Debug.Log("_toSend + " + _toSend);
+                //Debug.Log("_toSend + " + _toSend);
                 WarpClient.GetInstance().sendMove(_toSend);  //save move and call OnMoveCompleted()
             }
             SC_EnumGlobal.MatchState _matchState = Placement(_Index);
@@ -361,7 +365,7 @@ public class SC_GameLogic : MonoBehaviour
     }
     private void OnGameStarted(string _Sender, string _RoomId, string _NextTurn)
     {
-        Debug.Log("start");
+        SC_GlobalVariables.curType = SC_EnumGlobal.GameType.Multiplayer;
         InitGame();
 
         gameStarted = true;
@@ -386,11 +390,10 @@ public class SC_GameLogic : MonoBehaviour
     }
     private void OnMoveCompleted(MoveEvent _Move)
     {
-        if (_Move.getSender() != SC_GlobalVariables.userId  && SC_GlobalVariables.curType == SC_EnumGlobal.GameType.Multiplayer)
+        if (_Move.getSender() != SC_GlobalVariables.userId && SC_GlobalVariables.curType == SC_EnumGlobal.GameType.Multiplayer)
         {
             // get index to display to anuther player
             Dictionary<string, object> _data = (Dictionary<string, object>)Json.Deserialize(_Move.getMoveData());
-            Debug.Log("_data " + _data);
             int _index = int.Parse(_data["Index"].ToString());
 
             SC_EnumGlobal.MatchState _curState = Placement(_index);
@@ -399,16 +402,10 @@ public class SC_GameLogic : MonoBehaviour
         }
         curTime = Time.time;
 
-        Debug.Log("curTurncurTurncurTurn " + curTurn);
-
-        if (_Move.getNextTurn() == SC_GlobalVariables.userId )
+        if (_Move.getNextTurn() == SC_GlobalVariables.userId)
             curTurn = SC_EnumGlobal.TurnState.Player;
-        else curTurn = SC_EnumGlobal.TurnState.Opponent;
-
-        //if(SC_GlobalVariables.userLeftId != "")
-        //    curTurn = SC_EnumGlobal.TurnState.Opponent;
-
-        Debug.Log("curTurncurTurncurTurn22222 " + curTurn);
+        else
+            curTurn = SC_EnumGlobal.TurnState.Opponent;
     }
     private void OnGameStopped(string _Sender, string _RoomId)
     {
@@ -416,19 +413,16 @@ public class SC_GameLogic : MonoBehaviour
     }
     private void OnUserLeftRoom(RoomData eventObj, string _UserName)
     {
-        Debug.Log("left the room : " + _UserName + "currturn of : " + SC_GlobalVariables.userId);
-
         SC_GlobalVariables.userLeftId = _UserName;
         if (_UserName != SC_GlobalVariables.userId && curTurn == SC_EnumGlobal.TurnState.Player)
         {
-            Debug.Log("Wait for Player move and then do AI move");
+            //Debug.Log("Wait for Player move and then do AI move");
             modeChange = true;
             SC_GlobalVariables.curType = SC_EnumGlobal.GameType.SinglePlayer;
         }
-        //TO DO : fix when opennent left when thets his turn
         else if (curTurn == SC_EnumGlobal.TurnState.Opponent)
         {
-            Debug.Log("Do Ai move only");
+            //Debug.Log("Do Ai move only");
             gameStarted = false;
             SC_GlobalVariables.curType = SC_EnumGlobal.GameType.SinglePlayer;
             unityObjects["Txt_AiPlaying"].GetComponent<Text>().text = "Ai Playing..";
@@ -443,10 +437,7 @@ public class SC_GameLogic : MonoBehaviour
         if (SC_GlobalVariables.curType == SC_EnumGlobal.GameType.SinglePlayer)
             InitGame();
         else if (SC_GlobalVariables.curType == SC_EnumGlobal.GameType.Multiplayer)
-        {
-            Debug.Log("startttt agin");
             WarpClient.GetInstance().startGame();
-        }
     }
     #endregion
 }

@@ -100,13 +100,13 @@ public class SC_Board
 
             || (direction == (int)SC_EnumGlobal.Direction.Left && (is_Boundary_Right(cuurDirection) && !is_Boundary_Left(prevDirection)) && cuurDirection <= (int)SC_EnumGlobal.Boundary.Bottom && cuurDirection >= (int)SC_EnumGlobal.Boundary.Top)
             || (direction == (int)SC_EnumGlobal.Direction.Left && (is_Boundary_Left(cuurDirection) || (!is_Boundary_Left(cuurDirection) && !is_Boundary_Right(cuurDirection))) && cuurDirection <= (int)SC_EnumGlobal.Boundary.Bottom && cuurDirection >= (int)SC_EnumGlobal.Boundary.Top)
-            || (direction == (int)SC_EnumGlobal.Direction.LeftDown && (cuurDirection <= (int)SC_EnumGlobal.Boundary.Bottom && ((is_Boundary_Right(cuurDirection) && !is_Boundary_Left(prevDirection)) || (!is_Boundary_Left(cuurDirection) && !is_Boundary_Right(cuurDirection)))))
-            || (direction == (int)SC_EnumGlobal.Direction.LeftUp && (cuurDirection >= (int)SC_EnumGlobal.Boundary.Top && ((is_Boundary_Right(cuurDirection) && !is_Boundary_Left(prevDirection)) || (!is_Boundary_Left(cuurDirection) && !is_Boundary_Right(cuurDirection)))))
+            || (direction == (int)SC_EnumGlobal.Direction.LeftDown && cuurDirection <= (int)SC_EnumGlobal.Boundary.Bottom && (is_Boundary_Left(cuurDirection) || (!is_Boundary_Left(cuurDirection) && !is_Boundary_Right(cuurDirection)) ))
+            || (direction == (int)SC_EnumGlobal.Direction.LeftUp && (cuurDirection >= (int)SC_EnumGlobal.Boundary.Top && (is_Boundary_Left(cuurDirection) || (!is_Boundary_Left(cuurDirection)) && !is_Boundary_Right(cuurDirection))))
 
             || (direction == (int)SC_EnumGlobal.Direction.Right && (is_Boundary_Left(cuurDirection) && !is_Boundary_Right(prevDirection)) && cuurDirection <= (int)SC_EnumGlobal.Boundary.Bottom && cuurDirection >= (int)SC_EnumGlobal.Boundary.Top)
             || (direction == (int)SC_EnumGlobal.Direction.Right && (is_Boundary_Right(cuurDirection) || (!is_Boundary_Right(cuurDirection) && !is_Boundary_Left(cuurDirection))) && cuurDirection <= (int)SC_EnumGlobal.Boundary.Bottom && cuurDirection >= (int)SC_EnumGlobal.Boundary.Top)
-            || (direction == (int)SC_EnumGlobal.Direction.RightDown && cuurDirection <= (int)SC_EnumGlobal.Boundary.Bottom && ((is_Boundary_Left(cuurDirection) && !is_Boundary_Right(prevDirection)) || (!is_Boundary_Right(cuurDirection) && !is_Boundary_Left(cuurDirection))))
-            || (direction == (int)SC_EnumGlobal.Direction.RightUp && cuurDirection >= (int)SC_EnumGlobal.Boundary.Top && ((is_Boundary_Left(cuurDirection) && !is_Boundary_Right(prevDirection)) || (!is_Boundary_Right(cuurDirection) && !is_Boundary_Left(cuurDirection))))
+            || (direction == (int)SC_EnumGlobal.Direction.RightDown && cuurDirection <= (int)SC_EnumGlobal.Boundary.Bottom && (is_Boundary_Right(cuurDirection) || (!is_Boundary_Right(cuurDirection) && !is_Boundary_Left(cuurDirection))))
+            || (direction == (int)SC_EnumGlobal.Direction.RightUp && (cuurDirection >= (int)SC_EnumGlobal.Boundary.Top && (is_Boundary_Right(cuurDirection) || (!is_Boundary_Right(cuurDirection)) && !is_Boundary_Left(cuurDirection))))
             )
             return true;
         else return false;
@@ -114,8 +114,8 @@ public class SC_Board
     public List<int> SetOptionByDirection(int index, SC_EnumGlobal.Direction direction, SC_EnumGlobal.Boundary boundary, SC_EnumGlobal.SlotState slotState)
     {
         List<int> _options = new List<int>();
-        int cuurDirection = 0;
-        int prevDirection = 1;
+        int cuurDirection = 0; // The point I'm checking to see if i can go to.
+        int prevDirection = 1; // The point from which I come to the checking point - father of cuurDirection
 
         if (slotState == SC_EnumGlobal.SlotState.White) {cuurDirection = clickedWhite[index] + (int)direction;}
         else if (slotState == SC_EnumGlobal.SlotState.Black) {cuurDirection = clickedBlack[index] + (int)direction;}
@@ -125,7 +125,7 @@ public class SC_Board
             //Checking the cases of the matrix boundaries
             if (!is_in_Boundaries(cuurDirection, prevDirection, (int)direction, boundary))
             {
-               // Debug.Log("========>>>>>OUT>>> " +cuurDirection + "BY>> "+ direction+ "PRAV="+ prevDirection);
+                //Debug.Log("========>>>>>OUT>>> " +cuurDirection + "BY>> "+ direction+ "PRAV="+ prevDirection);
                 return new List<int>();
             }
             else if (slotState == curBoard[cuurDirection]) return new List<int>();

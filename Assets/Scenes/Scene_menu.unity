@@ -11664,7 +11664,7 @@ GameObject:
   - component: {fileID: 1763233793}
   m_Layer: 5
   m_Name: Btn_LeaveRoom
-  m_TagString: Untagged
+  m_TagString: unityObjects
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
